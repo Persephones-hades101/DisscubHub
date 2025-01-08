@@ -1,7 +1,3 @@
-export default function postCreatePage() {
-  return (
-    <div>
-      Create a post.
-    </div>
-  )
+export default function PostCreatePost() {
+  return <div>Post Create Pag</div>;
 }

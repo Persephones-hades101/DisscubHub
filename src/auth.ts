@@ -1,28 +1,37 @@
-import NextAuth, { Session, User } from "next-auth";
-import GitHub from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { db } from "./db";
+import NextAuth from 'next-auth';
+import Github from 'next-auth/providers/github';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { db } from '@/db';
+import { Session, User } from 'next-auth';
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-  throw new Error("Missing Github OAuth credentials");
+  throw new Error('Missing github oauth credentials');
 }
 
-export const { handlers: { GET, POST }, auth, signOut, signIn } = NextAuth({
+export const {
+  handlers: { GET, POST },
+  auth,
+  signOut,
+  signIn,
+} = NextAuth({
   adapter: PrismaAdapter(db),
   providers: [
-    GitHub({
+    Github({
       clientId: GITHUB_CLIENT_ID,
       clientSecret: GITHUB_CLIENT_SECRET,
     }),
   ],
+  trustHost: true,
   callbacks: {
-    async session({ session, user }: { session: Session, user: User }) {
+    // Usually not needed, here we are fixing a bug in nextauth
+    async session({ session, user }: { session: Session; user: User }) {
       if (session?.user && user) {
         session.user.id = user.id;
       }
+
       return session;
     },
   },
