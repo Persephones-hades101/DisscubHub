@@ -24,7 +24,7 @@ interface CreatePostFormState {
 export async function createPost(
   slug: string,
   formState: CreatePostFormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreatePostFormState> {
   const result = createPostSchema.safeParse({
     title: formData.get('title'),
@@ -54,6 +54,14 @@ export async function createPost(
     return {
       errors: {
         _form: ['Cannot find topic'],
+      },
+    };
+  }
+
+  if (!session.user.id) {
+    return {
+      errors: {
+        _form: ['User ID is missing.'],
       },
     };
   }
