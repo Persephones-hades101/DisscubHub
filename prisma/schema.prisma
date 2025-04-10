@@ -1,10 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas   = ["discuss"]
 }
 
 model Account {
@@ -24,6 +27,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@schema("discuss")
 }
 
 model Session {
@@ -32,6 +36,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@schema("discuss")
 }
 
 model User {
@@ -44,6 +50,8 @@ model User {
   sessions      Session[]
   Post          Post[]
   Comment       Comment[]
+
+  @@schema("discuss")
 }
 
 model VerificationToken {
@@ -52,6 +60,7 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+  @@schema("discuss")
 }
 
 model Topic {
@@ -62,6 +71,8 @@ model Topic {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@schema("discuss")
 }
 
 model Post {
@@ -77,6 +88,8 @@ model Post {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   topic    Topic     @relation(fields: [topicId], references: [id])
   comments Comment[]
+
+  @@schema("discuss")
 }
 
 model Comment {
@@ -93,4 +106,6 @@ model Comment {
   post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   children Comment[] @relation("Comments")
+
+  @@schema("discuss")
 }
